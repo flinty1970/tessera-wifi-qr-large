@@ -37,7 +37,24 @@ class WifiTile : public tessera::Tile {
     height_ = c.height;
     const int line = ui::line_height(Font::BODY);
     const int gap = ui::px(6);
-    const int available = std::max(1, height_ - line - gap);
+    // "Scan QR code to connect" above the code, in the largest of two fonts it fits in (shorter words on a narrow
+    // tile), where the tile is high enough for a heading, a code and the network's name.
+    // The tile's own name from the editor ("Name on the screen") is the heading where one was given.
+    const bool named = c.name != nullptr && c.name[0];
+    const std::string scan = named ? std::string(c.name) : std::string(plugin_->text("scan"));
+    const std::string scan_short = named ? scan : std::string(plugin_->text("scan_short"));
+    Font heading_font = Font::BODY;
+    std::string heading = scan_short;
+    if (ui::text_width(scan, Font::BODY_LARGE) <= width_) {
+      heading_font = Font::BODY_LARGE;
+      heading = scan;
+    } else if (ui::text_width(scan, Font::BODY) <= width_) {
+      heading = scan;
+    }
+    const int heading_h = ui::line_height(heading_font);
+    const bool headed = height_ >= heading_h + line + 2 * gap + ui::mm(14) && ui::text_width(heading, heading_font) <= width_;
+    const int top = headed ? heading_h + gap : 0;
+    const int available = std::max(1, height_ - top - line - gap);
     const int side = std::max(1, std::min(width_, available));
     const int zone = std::max(4, side / 12);
     const int code = std::max(21, side - 2 * zone);
@@ -49,10 +66,18 @@ class WifiTile : public tessera::Tile {
     lv_obj_set_style_border_color(qr_, theme::color(theme::QR_LIGHT), 0);
     lv_obj_set_style_border_width(qr_, zone, 0);
     lv_qrcode_set_size(qr_, code);
-    lv_obj_set_pos(qr_, (width_ - code) / 2, 0);
+    lv_obj_set_pos(qr_, (width_ - code) / 2, top);
     lv_obj_add_flag(qr_, LV_OBJ_FLAG_HIDDEN);
 #endif
 
+    if (headed) {
+      title_ = ui::label(c.parent, heading_font, theme::INK);
+      lv_obj_set_width(title_, width_);
+      lv_obj_set_height(title_, heading_h);
+      lv_obj_set_pos(title_, 0, 0);
+      lv_obj_set_style_text_align(title_, LV_TEXT_ALIGN_CENTER, 0);
+      ui::set_text(title_, heading);
+    }
     status_ = ui::label(c.parent, Font::BODY, theme::MUTED);
     lv_obj_set_width(status_, width_);
     lv_obj_set_height(status_, line);
@@ -87,6 +112,7 @@ class WifiTile : public tessera::Tile {
 
   void on_theme() override {
     ui::set_color(status_, theme::MUTED);
+    if (title_) ui::set_color(title_, theme::INK);
 #if LV_USE_QRCODE
     lv_qrcode_set_dark_color(qr_, theme::color(theme::QR_DARK));
     lv_qrcode_set_light_color(qr_, theme::color(theme::QR_LIGHT));
@@ -102,6 +128,7 @@ class WifiTile : public tessera::Tile {
   uint64_t fingerprint_ = 0;
   lv_obj_t *qr_{};
   lv_obj_t *status_{};
+  lv_obj_t *title_{};
 };
 
 void WifiQr::setup() { add_tile("connect", [this]() { return new WifiTile(this); }); }

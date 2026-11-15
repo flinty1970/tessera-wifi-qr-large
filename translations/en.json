@@ -1,7 +1,11 @@
 {
-  "_meta": { "name": "English" },
+  "_meta": {
+    "name": "English"
+  },
   "screen": {
-    "helpers_empty": "Fill in both Wi-Fi helpers"
+    "helpers_empty": "Fill in both Wi-Fi helpers",
+    "scan": "Scan QR code to connect",
+    "scan_short": "Scan to connect"
   },
   "app": {
     "name": "Wi-Fi QR (large)",

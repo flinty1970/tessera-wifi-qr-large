@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.1 - 2026-11-15
+
+- "Scan QR code to connect" above the code.
+
 ## 0.2.0 - 2026-11-15
 
 - A copy of Wi-Fi QR 0.1.1 by dynodix (MIT) under an id of its own, whose tile grows to 9 x 9 cells. The code
