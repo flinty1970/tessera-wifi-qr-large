@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.2
+
+- The heading and the network's name stand in the middle of the tile, over and under the code.
+
 ## 0.2.1 - 2026-11-15
 
 - "Scan QR code to connect" above the code.

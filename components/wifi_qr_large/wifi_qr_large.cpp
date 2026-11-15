@@ -28,6 +28,15 @@ static uint64_t fingerprint(const std::string &value) {
   return hash;
 }
 
+// A line of words in the middle of the tile: the label is as wide as its words and stands half way, so it is centred
+// whatever the label's own alignment does, under and over the code alike.
+static void centre(lv_obj_t *label, const std::string &text, Font font, int width) {
+  const int w = std::min(width, ui::text_width(text, font) + ui::px(4));
+  ui::set_text(label, text);
+  lv_obj_set_width(label, w);
+  lv_obj_set_x(label, (width - w) / 2);
+}
+
 class WifiTile : public tessera::Tile {
  public:
   explicit WifiTile(WifiQr *plugin) : plugin_(plugin) {}
@@ -40,8 +49,12 @@ class WifiTile : public tessera::Tile {
     // "Scan QR code to connect" above the code, in the largest of two fonts it fits in (shorter words on a narrow
     // tile), where the tile is high enough for a heading, a code and the network's name.
     // The tile's own name from the editor ("Name on the screen") is the heading where one was given.
-    const bool named = c.name != nullptr && c.name[0];
-    const std::string scan = named ? std::string(c.name) : std::string(plugin_->text("scan"));
+    // (Spaces before and after it are left out: they would push the words off the middle.)
+    std::string given = c.name != nullptr ? c.name : "";
+    while (!given.empty() && given.back() == ' ') given.pop_back();
+    while (!given.empty() && given.front() == ' ') given.erase(given.begin());
+    const bool named = !given.empty();
+    const std::string scan = named ? given : std::string(plugin_->text("scan"));
     const std::string scan_short = named ? scan : std::string(plugin_->text("scan_short"));
     Font heading_font = Font::BODY;
     std::string heading = scan_short;
@@ -76,7 +89,7 @@ class WifiTile : public tessera::Tile {
       lv_obj_set_height(title_, heading_h);
       lv_obj_set_pos(title_, 0, 0);
       lv_obj_set_style_text_align(title_, LV_TEXT_ALIGN_CENTER, 0);
-      ui::set_text(title_, heading);
+      centre(title_, heading, heading_font, width_);
     }
     status_ = ui::label(c.parent, Font::BODY, theme::MUTED);
     lv_obj_set_width(status_, width_);
@@ -89,7 +102,7 @@ class WifiTile : public tessera::Tile {
     const std::string &ssid = plugin_->ssid();
     const std::string &password = plugin_->password();
     if (ssid.empty() || password.empty()) {
-      ui::set_text(status_, plugin_->text("helpers_empty"));
+      centre(status_, plugin_->text("helpers_empty"), Font::BODY, width_);
 #if LV_USE_QRCODE
       lv_obj_add_flag(qr_, LV_OBJ_FLAG_HIDDEN);
 #endif
@@ -107,7 +120,7 @@ class WifiTile : public tessera::Tile {
       shown_ = true;
     }
 #endif
-    ui::set_text(status_, ssid);
+    centre(status_, ssid, Font::BODY, width_);
   }
 
   void on_theme() override {
