@@ -30,6 +30,6 @@ tiles:
   - id: connect
     name: tile_name
     icon: qrcode
-    sizes: { min: 1x1, max: 9x9 }
+    sizes: { min: 1x1, max: 9x9, full: true }
     memory: 900
     example: tile_example
