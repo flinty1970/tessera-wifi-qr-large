@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.3
+
+- The code stands in the middle of the tile: it was the width of its border too far right.
+
 ## 0.2.2
 
 - The heading and the network's name stand in the middle of the tile, over and under the code.

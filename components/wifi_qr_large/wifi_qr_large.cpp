@@ -79,7 +79,9 @@ class WifiTile : public tessera::Tile {
     lv_obj_set_style_border_color(qr_, theme::color(theme::QR_LIGHT), 0);
     lv_obj_set_style_border_width(qr_, zone, 0);
     lv_qrcode_set_size(qr_, code);
-    lv_obj_set_pos(qr_, (width_ - code) / 2, top);
+    // The code is drawn inside its light border, a zone further right than the object's own edge: start a zone
+    // earlier, so the code itself stands in the middle, under the heading.
+    lv_obj_set_pos(qr_, (width_ - code) / 2 - zone, top);
     lv_obj_add_flag(qr_, LV_OBJ_FLAG_HIDDEN);
 #endif
 

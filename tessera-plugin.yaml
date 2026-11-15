@@ -2,7 +2,7 @@
 # every name, label and hint below is a key into translations/<language>.json, part "app".
 # Every field is explained in docs/MANIFEST.md. Start a plugin of your own with: python3 tools/new_plugin.py <id>
 id: wifi_qr_large
-version: 0.2.2
+version: 0.2.3
 api: "0.8"
 icon: qrcode
 maintainer: flinty1970
